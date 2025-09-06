@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد قرارداد هوشمند | AI Contract Generator | Генератор смарт-контрактов | 智能合同生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@300;400;500;600;700;900&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --darker: #020617;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', 'Noto Serif SC', 'Noto Serif', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+        }
+        
+        /* Dark Glassmorphism */
+        .glassmorphism {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .glassmorphism-strong {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Simple Gradients */
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .gradient-bg-2 {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gradient-bg-3 {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+        
+        .gradient-bg-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+        
+        /* Simple Hover Effects */
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
+        }
+        
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Notification System */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-welcome {
+            background: var(--success);
+        }
+        
+        /* Contract Text Styling */
+        .contract-text {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 16px;
+            text-align: justify;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        [dir="ltr"] {
+            direction: ltr;
+            text-align: left;
+        }
+
+        [lang="zh"] body {
+            font-family: 'Noto Serif SC', 'Vazirmatn', 'Noto Serif', sans-serif;
+        }
+
+        [lang="ru"] body {
+            font-family: 'Noto Serif', 'Vazirmatn', 'Noto Serif SC', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white relative">
+    <!-- Language Switcher -->
+    <div class="lang-switcher glassmorphism rounded-lg p-2 flex space-x-2 space-x-reverse">
+        <button class="lang-btn px-3 py-1 rounded-lg hover:bg-white/10 transition-all" data-lang="fa">فارسی</button>
+        <button class="lang-btn px-3 py-1 rounded-lg hover:bg-white/10 transition-all" data-lang="en">English</button>
+        <button class="lang-btn px-3 py-1 rounded-lg hover:bg-white/10 transition-all" data-lang="zh">中文</button>
+        <button class="lang-btn px-3 py-1 rounded-lg hover:bg-white/10 transition-all" data-lang="ru">Русский</button>
+    </div>
+
+    <!-- Simple Background Pattern -->
+    <div class="fixed inset-0 opacity-10 pointer-events-none">
+        <div class="absolute inset-0" style="background-image: 
+            radial-gradient(circle at 20% 20%, #6366f1 0%, transparent 50%), 
+            radial-gradient(circle at 80% 80%, #8b5cf6 0%, transparent 50%);"></div>
+    </div>
+    
+    <!-- Notification System -->
+    <div id="notification" class="notification glassmorphism rounded-xl p-4 max-w-sm">
+        <div class="flex items-center space-x-3 space-x-reverse">
+            <div id="notificationIcon" class="text-2xl"></div>
+            <div>
+                <div id="notificationTitle" class="font-semibold"></div>
+                <div id="notificationMessage" class="text-sm text-gray-300"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-4xl">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">
+                    <i class="fas fa-file-contract text-indigo-400 mr-3"></i>
+                    <span class="lang" data-lang-fa="مولد قرارداد هوشمند" data-lang-en="AI Contract Generator" data-lang-zh="智能合同生成器" data-lang-ru="Генератор смарт-контрактов">مولد قرارداد هوشمند</span>
+                </h1>
+                <p class="text-gray-300 text-lg mb-6 lang" data-lang-fa="قرارداد حرفه‌ای خود را با قدرت هوش مصنوعی بسازید" data-lang-en="Create your professional contract with the power of AI" data-lang-zh="利用人工智能的力量创建您的专业合同" data-lang-ru="Создайте профессиональный контракт с помощью искусственного интеллекта"></p>
+                <div class="flex items-center justify-center space-x-6 space-x-reverse flex-wrap gap-2">
+                    <div class="glassmorphism rounded-full px-4 py-2 hover-lift">
+                        <i class="fas fa-users text-blue-400 mr-2"></i>
+                        <span class="text-sm">+10,000 <span class="lang" data-lang-fa="کاربر" data-lang-en="Users" data-lang-zh="用户" data-lang-ru="Пользователей"></span></span>
+                    </div>
+                    <div class="glassmorphism rounded-full px-4 py-2 hover-lift">
+                        <i class="fas fa-file-contract text-green-400 mr-2"></i>
+                        <span class="text-sm">+50,000 <span class="lang" data-lang-fa="قرارداد" data-lang-en="Contracts" data-lang-zh="合同" data-lang-ru="Контрактов"></span></span>
+                    </div>
+                    <div class="glassmorphism rounded-full px-4 py-2 hover-lift">
+                        <i class="fas fa-clock text-yellow-400 mr-2"></i>
+                        <span class="text-sm lang" data-lang-fa="در 30 ثانیه" data-lang-en="In 30 seconds" data-lang-zh="30秒内" data-lang-ru="За 30 секунд"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Form -->
+            <div class="glassmorphism-strong rounded-2xl p-8 mb-6 hover-lift">
+                <form id="contractForm" class="space-y-6">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-indigo-300 mb-2">
+                            <i class="fas fa-edit mr-2"></i>
+                            <span class="lang" data-lang-fa="تولید قرارداد هوشمند" data-lang-en="Generate Smart Contract" data-lang-zh="生成智能合同" data-lang-ru="Создание смарт-контракта"></span>
+                        </h3>
+                        <p class="text-gray-300 lang" data-lang-fa="موضوع قرارداد خود را وارد کنید" data-lang-en="Enter your contract subject" data-lang-zh="输入您的合同主题" data-lang-ru="Введите тему контракта"></p>
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-300 mb-3 flex items-center">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-400"></i>
+                            <span class="lang" data-lang-fa="موضوع قرارداد" data-lang-en="Contract Subject" data-lang-zh="合同主题" data-lang-ru="Тема контракта"></span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="subject" 
+                            name="subject"
+                            placeholder="مثال: طراحی سایت فروشگاهی، توسعه اپلیکیشن موبایل، مشاوره IT..."
+                            class="w-full px-4 py-4 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 hover:bg-gray-700/50"
+                            required
+                        >
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button type="button" class="glassmorphism px-3 py-1 rounded-full text-sm hover:bg-white/10 transition-all" onclick="fillSuggestion('طراحی سایت فروشگاهی', 'E-commerce Website Design', '电子商务网站设计', 'Дизайн интернет-магазина')">
+                                <i class="fas fa-store mr-1"></i>
+                                <span class="lang" data-lang-fa="طراحی سایت فروشگاهی" data-lang-en="E-commerce Website Design" data-lang-zh="电子商务网站设计" data-lang-ru="Дизайн интернет-магазина"></span>
+                            </button>
+                            <button type="button" class="glassmorphism px-3 py-1 rounded-full text-sm hover:bg-white/10 transition-all" onclick="fillSuggestion('توسعه اپلیکیشن موبایل', 'Mobile App Development', '移动应用开发', 'Разработка мобильного приложения')">
+                                <i class="fas fa-mobile-alt mr-1"></i>
+                                <span class="lang" data-lang-fa="توسعه اپلیکیشن موبایل" data-lang-en="Mobile App Development" data-lang-zh="移动应用开发" data-lang-ru="Разработка мобильного приложения"></span>
+                            </button>
+                            <button type="button" class="glassmorphism px-3 py-1 rounded-full text-sm hover:bg-white/10 transition-all" onclick="fillSuggestion('مشاوره IT', 'IT Consulting', 'IT咨询', 'ИТ-консультации')">
+                                <i class="fas fa-laptop-code mr-1"></i>
+                                <span class="lang" data-lang-fa="مشاوره IT" data-lang-en="IT Consulting" data-lang-zh="IT咨询" data-lang-ru="ИТ-консультации"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        id="generateBtn"
+                        class="w-full gradient-bg text-white font-semibold py-4 px-6 rounded-xl hover-lift transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    >
+                        <span id="btnText" class="flex items-center justify-center">
+                            <i class="fas fa-magic mr-2"></i>
+                            <span class="lang" data-lang-fa="تولید قرارداد با هوش مصنوعی" data-lang-en="Generate Contract with AI" data-lang-zh="使用人工智能生成合同" data-lang-ru="Создать контракт с ИИ"></span>
+                        </span>
+                        <span id="btnLoading" class="hidden flex items-center justify-center">
+                            <div class="loading-spinner mr-2"></div>
+                            <span class="lang" data-lang-fa="در حال تولید قرارداد..." data-lang-en="Generating Contract..." data-lang-zh="正在生成合同..." data-lang-ru="Создание контракта..."></span>
+                        </span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden glassmorphism-strong rounded-2xl p-8 text-center">
+                <div class="text-4xl mb-4">🤖</div>
+                <h3 class="text-xl font-bold text-indigo-300 mb-4 lang" data-lang-fa="هوش مصنوعی در حال کار است..." data-lang-en="AI is working..." data-lang-zh="人工智能正在工作..." data-lang-ru="ИИ работает..."></h3>
+                <div class="flex items-center justify-center space-x-3 space-x-reverse">
+                    <div class="loading-spinner"></div>
+                    <span class="text-lg lang" data-lang-fa="در حال تحلیل و تولید قرارداد" data-lang-en="Analyzing and generating contract" data-lang-zh="分析和生成合同" data-lang-ru="Анализ и создание контракта"></span>
+                </div>
+            </div>
+            
+            <!-- Contract Result -->
+            <div id="contractResult" class="hidden glassmorphism-strong rounded-2xl p-8 hover-lift">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3 space-x-reverse">
+                        <div class="text-3xl">✅</div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-green-400 lang" data-lang-fa="قرارداد آماده است!" data-lang-en="Contract is ready!" data-lang-zh="合同已准备好！" data-lang-ru="Контракт готов!"></h2>
+                            <p class="text-gray-300 lang" data-lang-fa="قرارداد شما با موفقیت تولید شد" data-lang-en="Your contract was successfully generated" data-lang-zh="您的合同已成功生成" data-lang-ru="Ваш контракт успешно создан"></p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3 space-x-reverse">
+                        <button 
+                            id="copyBtn"
+                            class="gradient-bg-2 hover-lift text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 space-x-reverse"
+                        >
+                            <i class="fas fa-copy"></i>
+                            <span class="lang" data-lang-fa="کپی" data-lang-en="Copy" data-lang-zh="复制" data-lang-ru="Копировать"></span>
+                        </button>
+                        <button 
+                            id="downloadBtn"
+                            class="gradient-bg-3 hover-lift text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 space-x-reverse"
+                        >
+                            <i class="fas fa-download"></i>
+                            <span class="lang" data-lang-fa="دانلود" data-lang-en="Download" data-lang-zh="下载" data-lang-ru="Скачать"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="glassmorphism rounded-xl p-6 border border-gray-600">
+                    <div id="contractContent" class="contract-text text-gray-100 leading-relaxed"></div>
+                </div>
+                
+                <button 
+                    id="newContractBtn"
+                    class="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-300"
+                >
+                    <i class="fas fa-plus mr-2"></i>
+                    <span class="lang" data-lang-fa="تولید قرارداد جدید" data-lang-en="Generate New Contract" data-lang-zh="生成新合同" data-lang-ru="Создать новый контракт"></span>
+                </button>
+            </div>
+            
+            <!-- Error State -->
+            <div id="errorState" class="hidden glassmorphism-strong rounded-2xl p-8 text-center border border-red-500/30">
+                <div class="text-4xl mb-4">⚠️</div>
+                <h3 class="text-xl font-bold text-red-400 mb-2 lang" data-lang-fa="خطا در تولید قرارداد" data-lang-en="Error in generating contract" data-lang-zh="生成合同出错" data-lang-ru="Ошибка при создании контракта"></h3>
+                <p id="errorMessage" class="text-gray-300 mb-4"></p>
+                <div class="flex justify-center space-x-4 space-x-reverse">
+                    <button 
+                        id="retryBtn"
+                        class="gradient-bg-danger hover-lift text-white px-6 py-3 rounded-lg transition-all duration-300"
+                    >
+                        <i class="fas fa-redo mr-2"></i>
+                        <span class="lang" data-lang-fa="تلاش مجدد" data-lang-en="Retry" data-lang-zh="重试" data-lang-ru="Повторить"></span>
+                    </button>
+                    <button 
+                        onclick="location.reload()"
+                        class="glassmorphism hover-lift text-white px-6 py-3 rounded-lg transition-all duration-300"
+                    >
+                        <i class="fas fa-refresh mr-2"></i>
+                        <span class="lang" data-lang-fa="بارگذاری مجدد" data-lang-en="Reload" data-lang-zh="重新加载" data-lang-ru="Перезагрузить"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative mt-16 border-t border-gray-700/50">
+        <div class="glassmorphism">
+            <div class="max-w-6xl mx-auto px-4 py-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- About Section -->
+                    <div class="text-center md:text-right">
+                        <h3 class="text-lg font-bold mb-3 text-indigo-300 lang" data-lang-fa="درباره پروژه" data-lang-en="About the Project" data-lang-zh="关于项目" data-lang-ru="О проекте"></h3>
+                        <p class="text-gray-400 text-sm leading-relaxed lang" data-lang-fa="مولد قرارداد هوشمند با استفاده از تکنولوژی‌های مدرن و هوش مصنوعی طراحی شده است." data-lang-en="The Smart Contract Generator is designed using modern technologies and AI." data-lang-zh="智能合同生成器使用现代技术和人工智能设计。" data-lang-ru="Генератор смарт-контрактов разработан с использованием современных технологий и ИИ."></p>
+                    </div>
+                    
+                    <!-- Channels Section -->
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold mb-3 text-indigo-300 lang" data-lang-fa="لینک‌های ما" data-lang-en="Our Links" data-lang-zh="我们的链接" data-lang-ru="Наши ссылки"></h3>
+                        <div class="space-y-2">
+                            <div class="glassmorphism rounded-lg p-3 hover:bg-white/10 transition-all cursor-pointer group" onclick="window.open('https://github.com/HamidYaraliOfficial')">
+                                <div class="flex items-center justify-center space-x-2 space-x-reverse">
+                                    <span class="text-lg">📢</span>
+                                    <div>
+                                        <div class="font-semibold text-blue-400 text-sm lang" data-lang-fa="گیت‌هاب" data-lang-en="GitHub" data-lang-zh="GitHub" data-lang-ru="GitHub"></div>
+                                        <div class="text-xs text-gray-400 group-hover:text-white transition-colors">HamidYaraliOfficial</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="glassmorphism rounded-lg p-3 hover:bg-white/10 transition-all cursor-pointer group" onclick="window.open('https://www.instagram.com/hamidyaraliofficial?igsh=MWpxZjhhMHZuNnlpYQ==')">
+                                <div class="flex items-center justify-center space-x-2 space-x-reverse">
+                                    <span class="text-lg">👨‍💻</span>
+                                    <div>
+                                        <div class="font-semibold text-purple-400 text-sm lang" data-lang-fa="اینستاگرام" data-lang-en="Instagram" data-lang-zh="Instagram" data-lang-ru="Instagram"></div>
+                                        <div class="text-xs text-gray-400 group-hover:text-white transition-colors">hamidyaraliofficial</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Features Section -->
+                    <div class="text-center md:text-left">
+                        <h3 class="text-lg font-bold mb-3 text-indigo-300 lang" data-lang-fa="ویژگی‌ها" data-lang-en="Features" data-lang-zh="功能" data-lang-ru="Особенности"></h3>
+                        <ul class="space-y-1 text-gray-400 text-sm">
+                            <li class="flex items-center justify-center md:justify-start space-x-2 space-x-reverse">
+                                <span class="text-green-400">✓</span>
+                                <span class="lang" data-lang-fa="تولید سریع قرارداد" data-lang-en="Fast contract generation" data-lang-zh="快速生成合同" data-lang-ru="Быстрое создание контракта"></span>
+                            </li>
+                            <li class="flex items-center justify-center md:justify-start space-x-2 space-x-reverse">
+                                <span class="text-green-400">✓</span>
+                                <span class="lang" data-lang-fa="پشتیبانی از زبان‌های متعدد" data-lang-en="Multilingual support" data-lang-zh="多语言支持" data-lang-ru="Поддержка нескольких языков"></span>
+                            </li>
+                            <li class="flex items-center justify-center md:justify-start space-x-2 space-x-reverse">
+                                <span class="text-green-400">✓</span>
+                                <span class="lang" data-lang-fa="دانلود و کپی آسان" data-lang-en="Easy download and copy" data-lang-zh="轻松下载和复制" data-lang-ru="Простое скачивание и копирование"></span>
+                            </li>
+                            <li class="flex items-center justify-center md:justify-start space-x-2 space-x-reverse">
+                                <span class="text-green-400">✓</span>
+                                <span class="lang" data-lang-fa="رابط کاربری مدرن" data-lang-en="Modern user interface" data-lang-zh="现代用户界面" data-lang-ru="Современный пользовательский интерфейс"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bottom Bar -->
+                <div class="border-t border-gray-700/50 mt-6 pt-6 text-center">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+                        <div class="text-gray-400 text-sm lang" data-lang-fa="© 2024 مولد قرارداد هوشمند - تمامی حقوق محفوظ است" data-lang-en="© 2024 AI Contract Generator - All rights reserved" data-lang-zh="© 2024 智能合同生成器 - 保留所有权利" data-lang-ru="© 2024 Генератор смарт-контрактов - Все права защищены"></div>
+                        <div class="flex items-center space-x-2 space-x-reverse text-sm">
+                            <span class="text-gray-400 lang" data-lang-fa="ساخته شده با" data-lang-en="Built with" data-lang-zh="用爱构建" data-lang-ru="Создано с"></span>
+                            <span class="text-red-500">❤️</span>
+                            <span class="text-gray-400 lang" data-lang-fa="برای جامعه توسعه دهندگان" data-lang-en="for the developer community" data-lang-zh="为开发者社区" data-lang-ru="для сообщества разработчиков"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_TOKEN = 'jrfxczmnu1hwjqo:x5qSb4mDAb9uRtG3gBga';
+        const API_BASE_URL = 'https://api.majidapi.ir/ai/contract-sample';
+        
+        const form = document.getElementById('contractForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const loadingState = document.getElementById('loadingState');
+        const contractResult = document.getElementById('contractResult');
+        const contractContent = document.getElementById('contractContent');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const newContractBtn = document.getElementById('newContractBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        
+        let currentSubject = '';
+        let currentContract = '';
+        
+        // Language handling
+        const translations = {
+            fa: {
+                placeholders: [
+                    'طراحی سایت فروشگاهی...',
+                    'توسعه اپلیکیشن موبایل...',
+                    'مشاوره IT و فناوری...',
+                    'طراحی لوگو و برندینگ...',
+                    'خدمات سئو و دیجیتال مارکتینگ...'
+                ]
+            },
+            en: {
+                placeholders: [
+                    'E-commerce Website Design...',
+                    'Mobile App Development...',
+                    'IT Consulting...',
+                    'Logo and Branding Design...',
+                    'SEO and Digital Marketing Services...'
+                ]
+            },
+            zh: {
+                placeholders: [
+                    '电子商务网站设计...',
+                    '移动应用开发...',
+                    'IT咨询...',
+                    '标志和品牌设计...',
+                    'SEO和数字营销服务...'
+                ]
+            },
+            ru: {
+                placeholders: [
+                    'Дизайн интернет-магазина...',
+                    'Разработка мобильного приложения...',
+                    'ИТ-консультации...',
+                    'Дизайн логотипа и брендинга...',
+                    'Услуги SEO и цифрового маркетинга...'
+                ]
+            }
+        };
+
+        function setLanguage(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+            document.querySelectorAll('.lang').forEach(el => {
+                el.textContent = el.dataset[`lang${lang}`] || el.textContent;
+            });
+
+            // Update placeholder animation
+            const input = document.getElementById('subject');
+            let placeholderIndex = 0;
+            input.placeholder = translations[lang].placeholders[placeholderIndex];
+            clearInterval(window.placeholderInterval);
+            window.placeholderInterval = setInterval(() => {
+                if (!input.value && document.activeElement !== input) {
+                    input.placeholder = translations[lang].placeholders[placeholderIndex];
+                    placeholderIndex = (placeholderIndex + 1) % translations[lang].placeholders.length;
+                }
+            }, 3000);
+
+            // Update active button style
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('bg-indigo-500', btn.dataset.lang === lang);
+                btn.classList.toggle('text-white', btn.dataset.lang === lang);
+            });
+        }
+
+        // Initialize language
+        setLanguage('fa');
+
+        // Language switcher event listeners
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setLanguage(btn.dataset.lang);
+            });
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const subject = document.getElementById('subject').value.trim();
+            if (!subject) return;
+            
+            currentSubject = subject;
+            await generateContract(subject);
+        });
+        
+        async function generateContract(subject) {
+            // Show loading state
+            showLoading();
+            
+            try {
+                const url = `${API_BASE_URL}?subject=${encodeURIComponent(subject)}&token=${API_TOKEN}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`خطا در درخواست: ${response.status}`);
+                }
+                
+                const data = await response.text();
+                
+                // Parse JSON response and extract only the contract text
+                let contractText = '';
+                try {
+                    const jsonData = JSON.parse(data);
+                    contractText = jsonData.result || data;
+                } catch (e) {
+                    // If not JSON, use as is
+                    contractText = data;
+                }
+                
+                // Clean the contract text - remove any extra information
+                currentContract = contractText.trim();
+                
+                // Show success
+                showSuccess(currentContract);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message || document.documentElement.lang === 'fa' ? 'خطا در اتصال به سرور' : 
+                    document.documentElement.lang === 'en' ? 'Error connecting to server' : 
+                    document.documentElement.lang === 'zh' ? '连接服务器错误' : 'Ошибка подключения к серверу');
+            }
+        }
+        
+        function showLoading() {
+            hideAllStates();
+            generateBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+            loadingState.classList.remove('hidden');
+        }
+        
+        function showSuccess(contract) {
+            hideAllStates();
+            contractContent.textContent = contract;
+            contractResult.classList.remove('hidden');
+            resetButton();
+        }
+        
+        function showError(message) {
+            hideAllStates();
+            errorMessage.textContent = message;
+            errorState.classList.remove('hidden');
+            resetButton();
+        }
+        
+        function hideAllStates() {
+            loadingState.classList.add('hidden');
+            contractResult.classList.add('hidden');
+            errorState.classList.add('hidden');
+        }
+        
+        function resetButton() {
+            generateBtn.disabled = false;
+            btnText.classList.remove('hidden');
+            btnLoading.classList.add('hidden');
+        }
+        
+        // Copy functionality
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(currentContract);
+                copyBtn.innerHTML = `<i class="fas fa-check"></i><span class="lang" data-lang-fa="کپی شد" data-lang-en="Copied" data-lang-zh="已复制" data-lang-ru="Скопировано"></span>`;
+                showNotification(
+                    document.documentElement.lang === 'fa' ? 'موفق!' : 
+                    document.documentElement.lang === 'en' ? 'Success!' : 
+                    document.documentElement.lang === 'zh' ? '成功！' : 'Успех!',
+                    document.documentElement.lang === 'fa' ? 'قرارداد در کلیپ‌بورد کپی شد' : 
+                    document.documentElement.lang === 'en' ? 'Contract copied to clipboard' : 
+                    document.documentElement.lang === 'zh' ? '合同已复制到剪贴板' : 'Контракт скопирован в буфер обмена',
+                    '✅', 'success'
+                );
+                setTimeout(() => {
+                    copyBtn.innerHTML = `<i class="fas fa-copy"></i><span class="lang" data-lang-fa="کپی" data-lang-en="Copy" data-lang-zh="复制" data-lang-ru="Копировать"></span>`;
+                }, 2000);
+            } catch (error) {
+                console.error('Copy failed:', error);
+                // Fallback method for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentContract;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyBtn.innerHTML = `<i class="fas fa-check"></i><span class="lang" data-lang-fa="کپی شد" data-lang-en="Copied" data-lang-zh="已复制" data-lang-ru="Скопировано"></span>`;
+                    showNotification(
+                        document.documentElement.lang === 'fa' ? 'موفق!' : 
+                        document.documentElement.lang === 'en' ? 'Success!' : 
+                        document.documentElement.lang === 'zh' ? '成功！' : 'Успех!',
+                        document.documentElement.lang === 'fa' ? 'قرارداد در کلیپ‌بورد کپی شد' : 
+                        document.documentElement.lang === 'en' ? 'Contract copied to clipboard' : 
+                        document.documentElement.lang === 'zh' ? '合同已复制到剪贴板' : 'Контракт скопирован в буфер обмена',
+                        '✅', 'success'
+                    );
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `<i class="fas fa-copy"></i><span class="lang" data-lang-fa="کپی" data-lang-en="Copy" data-lang-zh="复制" data-lang-ru="Копировать"></span>`;
+                    }, 2000);
+                } catch (fallbackError) {
+                    showNotification(
+                        document.documentElement.lang === 'fa' ? 'خطا' : 
+                        document.documentElement.lang === 'en' ? 'Error' : 
+                        document.documentElement.lang === 'zh' ? '错误' : 'Ошибка',
+                        document.documentElement.lang === 'fa' ? 'امکان کپی کردن وجود ندارد' : 
+                        document.documentElement.lang === 'en' ? 'Unable to copy' : 
+                        document.documentElement.lang === 'zh' ? '无法复制' : 'Невозможно скопировать',
+                        '❌', 'error'
+                    );
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+        
+        // Download functionality
+        downloadBtn.addEventListener('click', () => {
+            const blob = new Blob([currentContract], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = document.documentElement.lang === 'fa' ? `قرارداد-${currentSubject}.txt` : 
+                        document.documentElement.lang === 'en' ? `Contract-${currentSubject}.txt` : 
+                        document.documentElement.lang === 'zh' ? `合同-${currentSubject}.txt` : `Контракт-${currentSubject}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // New contract button
+        newContractBtn.addEventListener('click', () => {
+            hideAllStates();
+            document.getElementById('subject').value = '';
+            document.getElementById('subject').focus();
+        });
+        
+        // Retry button
+        retryBtn.addEventListener('click', () => {
+            if (currentSubject) {
+                generateContract(currentSubject);
+            }
+        });
+        
+        // Enhanced notification system
+        function showNotification(title, message, icon, type = 'info') {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            const notificationIcon = document.getElementById('notificationIcon');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notificationIcon.textContent = icon;
+            
+            // Set colors and styles based on type
+            if (type === 'welcome') {
+                notification.className = 'notification notification-welcome rounded-xl p-4 max-w-sm';
+                notificationTitle.style.color = 'white';
+                notificationMessage.style.color = 'rgba(255, 255, 255, 0.9)';
+            } else {
+                notification.className = `notification glassmorphism rounded-xl p-4 max-w-sm ${
+                    type === 'success' ? 'border-green-500/30' : 
+                    type === 'error' ? 'border-red-500/30' : 
+                    'border-blue-500/30'
+                }`;
+                notificationTitle.style.color = '';
+                notificationMessage.style.color = '';
+            }
+            
+            notification.classList.add('show');
+            
+            const duration = type === 'welcome' ? 5000 : 3000;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+        
+        // Suggestion function
+        function fillSuggestion(fa, en, zh, ru) {
+            const lang = document.documentElement.lang;
+            document.getElementById('subject').value = lang === 'fa' ? fa : lang === 'en' ? en : lang === 'zh' ? zh : ru;
+            document.getElementById('subject').focus();
+        }
+        
+        // Focus on input when page loads
+        document.getElementById('subject').focus();
+        
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification(
+                document.documentElement.lang === 'fa' ? 'خوش آمدید! 🎉' : 
+                document.documentElement.lang === 'en' ? 'Welcome! 🎉' : 
+                document.documentElement.lang === 'zh' ? '欢迎！🎉' : 'Добро пожаловать! 🎉',
+                document.documentElement.lang === 'fa' ? 'به مولد قرارداد هوشمند خوش آمدید. موضوع قرارداد خود را وارد کنید و شروع کنید!' : 
+                document.documentElement.lang === 'en' ? 'Welcome to the AI Contract Generator. Enter your contract subject and get started!' : 
+                document.documentElement.lang === 'zh' ? '欢迎使用智能合同生成器。输入您的合同主题并开始！' : 'Добро пожаловать в генератор смарт-контрактов. Введите тему контракта и начните!',
+                '🚀', 'welcome'
+            );
+        }, 1000);
+
+        // Enhanced input animations
+        document.getElementById('subject').addEventListener('focus', function() {
+            this.parentElement.classList.add('scale-105');
+        });
+        
+        document.getElementById('subject').addEventListener('blur', function() {
+            this.parentElement.classList.remove('scale-105');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97113bb3e64fc713',t:'MTc1NTUxODI0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>
